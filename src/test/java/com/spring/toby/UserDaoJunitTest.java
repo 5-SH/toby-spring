@@ -2,6 +2,7 @@ package com.spring.toby;
 
 import org.hamcrest.core.Is;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -10,17 +11,27 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import java.sql.SQLException;
 
 public class UserDaoJunitTest {
+  private NewUserDao dao;
+  private User user1;
+  private User user2;
+  private User user3;
+
+  @Before
+  public void setUp() {
+    ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
+    this.dao = context.getBean("newUserDao", NewUserDao.class);
+
+    this.user1 = new User("test1", "테스트일", "1234");
+    this.user2 = new User("test2", "테스트이", "1234");
+    this.user3 = new User("test3", "테스트삼", "1234");
+  }
+
   @Test
   public void addAndGet() {
-    ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-    NewUserDao dao = context.getBean("newUserDao", NewUserDao.class);
-
     try {
       dao.deleteAll();
       Assert.assertThat(dao.getCount(), Is.is(0));
 
-      User user1 = new User("test1", "테스트일", "1234");
-      User user2 = new User("test2", "테스트이", "1234");
       dao.add(user1);
       dao.add(user2);
 
@@ -40,13 +51,6 @@ public class UserDaoJunitTest {
 
   @Test
   public void count() {
-    ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-    NewUserDao dao = context.getBean("newUserDao", NewUserDao.class);
-
-    User user1 = new User("Test1", "테스트일", "1234");
-    User user2 = new User("Test2", "테스트이", "1234");
-    User user3 = new User("Test3", "테스트삼", "1234");
-
     try {
       dao.deleteAll();
       Assert.assertThat(dao.getCount(), Is.is(0));
@@ -66,9 +70,6 @@ public class UserDaoJunitTest {
 
   @Test(expected= EmptyResultDataAccessException.class)
   public void getUserFailure() throws SQLException, ClassNotFoundException {
-    ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-    NewUserDao dao = context.getBean("newUserDao", NewUserDao.class);
-
     dao.deleteAll();
     Assert.assertThat(dao.getCount(), Is.is(0));
     dao.get("unknown_id");
