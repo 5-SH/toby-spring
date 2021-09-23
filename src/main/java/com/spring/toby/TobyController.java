@@ -21,8 +21,9 @@ public class TobyController {
 		logger.info("Welcome home! The client locale is {}.", locale);
 
 		try {
-			ConnectionMaker connectionMaker = new NConnectionMaker();
-			UserDao dao = new UserDao(connectionMaker);
+//			ConnectionMaker connectionMaker = new NConnectionMaker();
+//			UserDao dao = new UserDao(connectionMaker);
+			UserDao dao = new DaoFactory().userDao();
 
 			User user = new User();
 			user.setId("whiteship");
