@@ -4,5 +4,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
-		
+	<bean id="connectionMaker" class="com.spring.toby.DConnectionMaker" />
+	<bean id="userDao" class="com.spring.toby.UserDao">
+		<property name="connectionMaker" ref="connectionMaker" />
+	</bean>
 </beans>
