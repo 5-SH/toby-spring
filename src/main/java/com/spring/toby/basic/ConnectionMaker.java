@@ -1,4 +1,4 @@
-package com.spring.toby;
+package com.spring.toby.basic;
 
 import java.sql.Connection;
 import java.sql.SQLException;

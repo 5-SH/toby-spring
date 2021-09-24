@@ -1,5 +1,6 @@
-package com.spring.toby;
+package com.spring.toby.basic;
 
+import com.spring.toby.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

@@ -1,16 +1,28 @@
 package com.spring.toby;
 
+import com.spring.toby.news.NewUserDao;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
-public class UserDaoJunitTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="classpath:applicationContext.xml")
+@DirtiesContext
+public class NewUserDaoJunitTest {
+//  @Autowired
+//  private ApplicationContext context;
+  @Autowired
   private NewUserDao dao;
   private User user1;
   private User user2;
@@ -18,8 +30,9 @@ public class UserDaoJunitTest {
 
   @Before
   public void setUp() {
-    ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-    this.dao = context.getBean("newUserDao", NewUserDao.class);
+//    this.dao = this.context.getBean("newUserDao", NewUserDao.class);
+    DataSource dataSource = new SingleConnectionDataSource("jdbc:mysql://localhost/spring", "root", "root", true);
+    dao.setDataSource(dataSource);
 
     this.user1 = new User("test1", "테스트일", "1234");
     this.user2 = new User("test2", "테스트이", "1234");

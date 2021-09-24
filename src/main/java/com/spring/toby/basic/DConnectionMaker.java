@@ -1,10 +1,12 @@
-package com.spring.toby;
+package com.spring.toby.basic;
+
+import com.spring.toby.basic.ConnectionMaker;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class NConnectionMaker implements ConnectionMaker {
+public class DConnectionMaker implements ConnectionMaker {
   @Override
   public Connection makeConnection() throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.jdbc.Driver");

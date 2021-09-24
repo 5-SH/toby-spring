@@ -1,4 +1,6 @@
-package com.spring.toby;
+package com.spring.toby.basic;
+
+import com.spring.toby.User;
 
 import java.sql.*;
 

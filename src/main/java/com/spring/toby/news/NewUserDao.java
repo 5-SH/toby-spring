@@ -1,5 +1,6 @@
-package com.spring.toby;
+package com.spring.toby.news;
 
+import com.spring.toby.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.sql.DataSource;

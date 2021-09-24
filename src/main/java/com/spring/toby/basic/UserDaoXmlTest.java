@@ -1,5 +1,6 @@
-package com.spring.toby;
+package com.spring.toby.basic;
 
+import com.spring.toby.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -7,12 +8,12 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 
 import java.sql.SQLException;
 
-public class NewUserDaoXmlTest {
+public class UserDaoXmlTest {
   private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
 
-  public static void main(String[] args) throws ClassNotFoundException, SQLException {
+  public static void main(String[] args) throws ClassNotFoundException, SQLException  {
     ApplicationContext context = new GenericXmlApplicationContext("classpath:applicationContext.xml");
-    NewUserDao dao = context.getBean("newUserDao", NewUserDao.class);
+    UserDao dao = context.getBean("userDao", UserDao.class);
     try {
       User user = new User();
       user.setId("osh");

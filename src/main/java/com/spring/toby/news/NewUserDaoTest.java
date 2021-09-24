@@ -1,5 +1,7 @@
-package com.spring.toby;
+package com.spring.toby.news;
 
+import com.spring.toby.User;
+import com.spring.toby.basic.UserDaoTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
