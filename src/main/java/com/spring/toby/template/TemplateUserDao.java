@@ -36,12 +36,7 @@ public class TemplateUserDao {
   }
 
   public void deleteAll() throws SQLException {
-    this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
-      @Override
-      public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-        return c.prepareStatement("delete from users");
-      }
-    });
+    this.jdbcContext.executeSql("delete from users");
   }
 
   public User get(String id) throws ClassNotFoundException, SQLException, EmptyResultDataAccessException {
