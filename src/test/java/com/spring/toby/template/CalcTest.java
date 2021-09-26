@@ -28,4 +28,9 @@ public class CalcTest {
   public void mulOfNumbers() throws IOException {
     Assert.assertThat(calculator.calcMul(numFilePath), Is.is(24));
   }
+
+  @Test
+  public void concatenateStrings() throws IOException {
+    Assert.assertThat(calculator.concatenate(numFilePath), Is.is("1234"));
+  }
 }
