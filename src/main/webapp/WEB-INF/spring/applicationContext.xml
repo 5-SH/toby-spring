@@ -5,7 +5,7 @@
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	<bean id="connectionMaker" class="com.spring.toby.basic.DConnectionMaker" />
-	<bean id="userDao" class="com.spring.toby.basic.UserDao">
+	<bean id="basicUserDao" class="com.spring.toby.basic.BasicUserDao">
 		<property name="connectionMaker" ref="connectionMaker" />
 	</bean>
 
@@ -30,6 +30,10 @@
 	</bean>
 
 	<bean id="apiUserDao" class="com.spring.toby.api.ApiUserDao">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="userDao" class="com.spring.toby.independent.UserDaoJdbc">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 </beans>

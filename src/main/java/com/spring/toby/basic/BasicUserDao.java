@@ -4,12 +4,12 @@ import com.spring.toby.User;
 
 import java.sql.*;
 
-public class UserDao {
+public class BasicUserDao {
   ConnectionMaker connectionMaker;
 
-  public UserDao() {}
+  public BasicUserDao() {}
 
-  public UserDao(ConnectionMaker connectionMaker) {
+  public BasicUserDao(ConnectionMaker connectionMaker) {
     this.connectionMaker = connectionMaker;
   }
 

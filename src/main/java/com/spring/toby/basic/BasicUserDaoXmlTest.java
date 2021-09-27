@@ -8,12 +8,12 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 
 import java.sql.SQLException;
 
-public class UserDaoXmlTest {
-  private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
+public class BasicUserDaoXmlTest {
+  private static final Logger logger = LoggerFactory.getLogger(BasicUserDaoTest.class);
 
   public static void main(String[] args) throws ClassNotFoundException, SQLException  {
     ApplicationContext context = new GenericXmlApplicationContext("classpath:applicationContext.xml");
-    UserDao dao = context.getBean("userDao", UserDao.class);
+    BasicUserDao dao = context.getBean("userDao", BasicUserDao.class);
     try {
       User user = new User();
       user.setId("osh");

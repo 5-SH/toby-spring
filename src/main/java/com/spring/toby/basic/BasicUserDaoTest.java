@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class UserDaoTest {
-  private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
+public class BasicUserDaoTest {
+  private static final Logger logger = LoggerFactory.getLogger(BasicUserDaoTest.class);
 
   public static void main(String[] args) throws ClassNotFoundException {
     ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-    UserDao dao = context.getBean("userDao", UserDao.class);
+    BasicUserDao dao = context.getBean("userDao", BasicUserDao.class);
     try {
       User user = new User();
       user.setId("whiteship");

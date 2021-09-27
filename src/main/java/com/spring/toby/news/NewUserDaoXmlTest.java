@@ -1,7 +1,7 @@
 package com.spring.toby.news;
 
 import com.spring.toby.User;
-import com.spring.toby.basic.UserDaoTest;
+import com.spring.toby.basic.BasicUserDaoTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -10,7 +10,7 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 import java.sql.SQLException;
 
 public class NewUserDaoXmlTest {
-  private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(BasicUserDaoTest.class);
 
   public static void main(String[] args) throws ClassNotFoundException, SQLException {
     ApplicationContext context = new GenericXmlApplicationContext("classpath:applicationContext.xml");

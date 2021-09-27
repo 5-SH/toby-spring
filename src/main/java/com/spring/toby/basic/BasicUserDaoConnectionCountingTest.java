@@ -7,12 +7,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.sql.SQLException;
 
-public class UserDaoConnectionCountingTest {
-  private static final Logger logger = LoggerFactory.getLogger(UserDaoTest.class);
+public class BasicUserDaoConnectionCountingTest {
+  private static final Logger logger = LoggerFactory.getLogger(BasicUserDaoTest.class);
 
   public static void main(String[] args) throws ClassNotFoundException, SQLException {
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(CountingDaoFactory.class);
-    UserDao dao = context.getBean("userDao", UserDao.class);
+    BasicUserDao dao = context.getBean("userDao", BasicUserDao.class);
 
     User user1 = dao.get("whiteship");
     logger.info("{}", user1.getName());

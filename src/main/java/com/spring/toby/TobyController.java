@@ -3,7 +3,7 @@ package com.spring.toby;
 import java.util.Locale;
 
 import com.spring.toby.basic.DaoFactory;
-import com.spring.toby.basic.UserDao;
+import com.spring.toby.basic.BasicUserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ public class TobyController {
 		try {
 //			ConnectionMaker connectionMaker = new NConnectionMaker();
 //			UserDao dao = new UserDao(connectionMaker);
-			UserDao dao = new DaoFactory().userDao();
+			BasicUserDao dao = new DaoFactory().userDao();
 
 			User user = new User();
 			user.setId("whiteship");
