@@ -1,13 +1,14 @@
 package com.spring.toby.independent;
 
-import com.spring.toby.User;
+import com.spring.toby.independent.User;
 
 import java.util.List;
 
 public interface UserDao {
-  void add(User user);
+  int add(User user);
   User get(String id);
   List<User> getAll();
-  void deleteAll();
+  int deleteAll();
   int getCount();
+  int update(User user);
 }
