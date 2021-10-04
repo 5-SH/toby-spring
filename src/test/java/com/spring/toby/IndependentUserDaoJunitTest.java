@@ -3,6 +3,7 @@ package com.spring.toby;
 import com.spring.toby.independent.Level;
 import com.spring.toby.independent.UserDao;
 import com.spring.toby.independent.User;
+import com.spring.toby.independent.UserService;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Before;
