@@ -3,7 +3,6 @@ package com.spring.toby;
 import com.spring.toby.independent.Level;
 import com.spring.toby.independent.UserDao;
 import com.spring.toby.independent.User;
-import com.spring.toby.independent.UserService;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Before;
@@ -135,6 +134,29 @@ public class IndependentUserDaoJunitTest {
     checkSameUser(user1, dao.get(user1.getId()));
     checkSameUser(user2, dao.get(user2.getId()));
     checkSameUser(user3, dao.get(user3.getId()));
+  }
+
+  @Test
+  public void upgradeLevel() {
+    Level[] levels = Level.values();
+    User user = user1;
+    for (Level level : levels) {
+      if (level.nextLevel() == null) continue;
+      user.setLevel(level);
+      user.upgradeLevel();
+      Assert.assertThat(user.getLevel(), Is.is(level.nextLevel()));
+    }
+  }
+
+  @Test(expected=IllegalStateException.class)
+  public void cannotUpgradeLevel() {
+    Level[] levels = Level.values();
+    User user = user1;
+    for (Level level : levels) {
+      if (level.nextLevel() != null) continue;
+      user.setLevel(level);
+      user.upgradeLevel();
+    }
   }
 
   private void checkSameUser(User user1, User user2) {
