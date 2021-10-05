@@ -22,6 +22,7 @@ import java.sql.SQLException;
 public class TemplateUserDaoJunitTest {
   @Autowired
   private TemplateUserDao dao;
+
   private User user1;
   private User user2;
   private User user3;

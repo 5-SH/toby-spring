@@ -1,9 +1,7 @@
-package com.spring.toby.template;
+package com.spring.toby;
 
-import com.spring.toby.independent.Level;
+import com.spring.toby.independent.*;
 import com.spring.toby.independent.User;
-import com.spring.toby.independent.UserDao;
-import com.spring.toby.independent.UserService;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Assert;
@@ -14,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +23,8 @@ public class UserServiceTest {
   UserService userService;
   @Autowired
   UserDao userDao;
+  @Autowired
+  private DataSource dataSource;
 
   List<User> users;
 
@@ -44,7 +45,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void upgradeLevels() {
+  public void upgradeLevels() throws Exception {
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
 
@@ -73,6 +74,24 @@ public class UserServiceTest {
 
     Assert.assertThat(userWithLevelRead.getLevel(), Is.is(userWithLevel.getLevel()));
     Assert.assertThat(userWithoutLevelRead.getLevel(), Is.is(userWithoutLevel.getLevel()));
+  }
+
+  @Test
+  public void upgradeAllOrNothing() throws Exception {
+    UserService testUserService = new TestUserService(users.get(3).getId());
+    testUserService.setUserDao(userDao);
+    testUserService.setDataSource(dataSource);
+
+    userDao.deleteAll();
+    for (User user : users) userDao.add(user);
+
+    try {
+      testUserService.upgradeLevels();
+      Assert.fail("TestUserServiceException expected");
+    } catch (TestUserServiceException e) {
+    }
+
+    checkLevelUpgraded(users.get(1), false);
   }
 
   private void checkLevelUpgraded(User user, boolean upgraded) {
