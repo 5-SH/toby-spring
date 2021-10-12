@@ -37,10 +37,18 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
+<!--	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">-->
+<!--		<property name="host" value="mail.server.com" />-->
+<!--	</bean>-->
+
+	<bean id="mailSender" class="com.spring.toby.independent.DummyMailSender">
+	</bean>
+
 	<bean id="userService" class="com.spring.toby.independent.UserService">
 		<property name="userDao" ref="userDao" />
 <!--		<property name="dataSource" ref="dataSource" />-->
 		<property name="transactionManager" ref="transactionManager" />
+		<property name="mailSender" ref="mailSender" />
 	</bean>
 
 	<bean id="userDao" class="com.spring.toby.independent.UserDaoJdbc">

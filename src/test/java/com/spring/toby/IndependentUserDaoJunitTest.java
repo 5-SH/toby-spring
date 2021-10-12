@@ -29,9 +29,9 @@ public class IndependentUserDaoJunitTest {
 
   @Before
   public void setUp() {
-    this.user1 = new User("test1", "테스트일", "1234", Level.BASIC, 1, 0);
-    this.user2 = new User("test2", "테스트이", "1234", Level.SILVER, 55, 10);
-    this.user3 = new User("test3", "테스트삼", "1234", Level.GOLD, 100, 40);
+    this.user1 = new User("test1", "테스트일", "1234", Level.BASIC, 1, 0, "mail1@test.com");
+    this.user2 = new User("test2", "테스트이", "1234", Level.SILVER, 55, 10, "mail2@test.com");
+    this.user3 = new User("test3", "테스트삼", "1234", Level.GOLD, 100, 40, "mail3@test.com");
   }
 
   @Test(expected= DataAccessException.class)
