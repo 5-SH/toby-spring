@@ -44,10 +44,14 @@
 	<bean id="mailSender" class="com.spring.toby.independent.DummyMailSender">
 	</bean>
 
-	<bean id="userService" class="com.spring.toby.independent.UserService">
+	<bean id="userService" class="com.spring.toby.independent.UserServiceTx">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="userService" ref="userServiceImpl" />
+	</bean>
+
+	<bean id="userServiceImpl" class="com.spring.toby.independent.UserServiceImpl">
 		<property name="userDao" ref="userDao" />
 <!--		<property name="dataSource" ref="dataSource" />-->
-		<property name="transactionManager" ref="transactionManager" />
 		<property name="mailSender" ref="mailSender" />
 	</bean>
 
