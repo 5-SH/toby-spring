@@ -49,24 +49,36 @@ public class UserServiceTest {
 
   @Test
   public void upgradeLevels() throws Exception {
-    userDao.deleteAll();
-    for (User user : users) userDao.add(user);
+    UserServiceImpl userServiceImpl = new UserServiceImpl();
+
+    MockUserDao mockUserDao = new MockUserDao(this.users);
+    userServiceImpl.setUserDao(mockUserDao);
 
     MockMailSender mockMailSender = new MockMailSender();
     userServiceImpl.setMailSender(mockMailSender);
 
     userServiceImpl.upgradeLevels();
 
-    checkLevelUpgraded(users.get(0), false);
-    checkLevelUpgraded(users.get(1), true);
-    checkLevelUpgraded(users.get(2), false);
-    checkLevelUpgraded(users.get(3), true);
-    checkLevelUpgraded(users.get(4), false);
+    List<User> updated = mockUserDao.getUpdated();
+    Assert.assertThat(updated.size(), Is.is(2));
+    checkUserAndLevel(updated.get(0), "test2", Level.SILVER);
+    checkUserAndLevel(updated.get(1), "test4", Level.GOLD);
+
+//    checkLevelUpgraded(users.get(0), false);
+//    checkLevelUpgraded(users.get(1), true);
+//    checkLevelUpgraded(users.get(2), false);
+//    checkLevelUpgraded(users.get(3), true);
+//    checkLevelUpgraded(users.get(4), false);
 
     List<String> requests = mockMailSender.getRequests();
     Assert.assertThat(requests.size(), Is.is(2));
     Assert.assertThat(requests.get(0), Is.is(users.get(1).getEmail()));
     Assert.assertThat(requests.get(1), Is.is(users.get(3).getEmail()));
+  }
+
+  private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
+    Assert.assertThat(updated.getId(), Is.is(expectedId));
+    Assert.assertThat(updated.getLevel(), Is.is(expectedLevel));
   }
 
   @Test
