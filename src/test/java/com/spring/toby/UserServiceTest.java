@@ -8,8 +8,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -79,6 +83,32 @@ public class UserServiceTest {
   private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
     Assert.assertThat(updated.getId(), Is.is(expectedId));
     Assert.assertThat(updated.getLevel(), Is.is(expectedLevel));
+  }
+
+  @Test
+  public void mockUpgradeLevels() throws Exception {
+    UserServiceImpl userServiceimpl = new UserServiceImpl();
+
+    UserDao mockUserDao = Mockito.mock(UserDao.class);
+    Mockito.when(mockUserDao.getAll()).thenReturn(this.users);
+    userServiceimpl.setUserDao(mockUserDao);
+
+    MailSender mockMailSender = Mockito.mock(MailSender.class);
+    userServiceimpl.setMailSender(mockMailSender);
+
+    userServiceimpl.upgradeLevels();
+
+    Mockito.verify(mockUserDao, Mockito.times(2)).update(Matchers.any(User.class));
+    Mockito.verify(mockUserDao).update(users.get(1));
+    Assert.assertThat(users.get(1).getLevel(), Is.is(Level.SILVER));
+    Mockito.verify(mockUserDao).update(users.get(3));
+    Assert.assertThat(users.get(3).getLevel(), Is.is(Level.GOLD));
+
+    ArgumentCaptor<SimpleMailMessage> mailMessageArg = ArgumentCaptor.forClass(SimpleMailMessage.class);
+    Mockito.verify(mockMailSender, Mockito.times(2)).send(mailMessageArg.capture());
+    List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
+    Assert.assertThat(mailMessages.get(0).getTo()[0], Is.is(users.get(1).getEmail()));
+    Assert.assertThat(mailMessages.get(1).getTo()[0], Is.is(users.get(3).getEmail()));
   }
 
   @Test
