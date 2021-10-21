@@ -2,6 +2,7 @@ package com.spring.toby;
 
 import com.spring.toby.independent.*;
 import com.spring.toby.independent.User;
+import com.spring.toby.proxy.TransactionHandler;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Assert;
@@ -18,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
@@ -146,6 +148,32 @@ public class UserServiceTest {
 
     try {
       userServiceTx.upgradeLevels();
+      Assert.fail("TestUserServiceException expected");
+    } catch (TestUserServiceException e) {
+    }
+
+    checkLevelUpgraded(users.get(1), false);
+  }
+
+  @Test
+  public void upgradeAllOrNothingProxy() throws Exception {
+    UserServiceImpl testUserServiceImpl = new TestUserService(users.get(3).getId());
+    testUserServiceImpl.setUserDao(userDao);
+    testUserServiceImpl.setMailSender(mailSender);
+
+    TransactionHandler txHandler = new TransactionHandler();
+    txHandler.setTarget(testUserServiceImpl);
+    txHandler.setTransactionManager(transactionManager);
+    txHandler.setPattern("upgradeLevels");
+    UserService userService = (UserService) Proxy.newProxyInstance(
+            getClass().getClassLoader(), new Class[] { UserService.class }, txHandler
+    );
+
+    userDao.deleteAll();
+    for (User user : users) userDao.add(user);
+
+    try {
+      userService.upgradeLevels();
       Assert.fail("TestUserServiceException expected");
     } catch (TestUserServiceException e) {
     }
