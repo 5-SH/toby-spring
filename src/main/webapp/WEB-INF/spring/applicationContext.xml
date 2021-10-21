@@ -58,4 +58,11 @@
 	<bean id="userDao" class="com.spring.toby.independent.UserDaoJdbc">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+
+	<bean id="userServiceTx" class="com.spring.toby.factorybean.TxProxyFactoryBean">
+		<property name="target" ref="userServiceImpl" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="pattern" value="upgradeLevels" />
+		<property name="serviceInterface" value="com.spring.toby.independent.UserService" />
+	</bean>
 </beans>

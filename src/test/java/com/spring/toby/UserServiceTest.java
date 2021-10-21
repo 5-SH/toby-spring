@@ -1,5 +1,6 @@
 package com.spring.toby;
 
+import com.spring.toby.factorybean.TxProxyFactoryBean;
 import com.spring.toby.independent.*;
 import com.spring.toby.independent.User;
 import com.spring.toby.proxy.TransactionHandler;
@@ -13,8 +14,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -34,6 +37,8 @@ public class UserServiceTest {
   PlatformTransactionManager transactionManager;
   @Autowired
   MailSender mailSender;
+  @Autowired
+  ApplicationContext context;
 
   List<User> users;
 
@@ -174,6 +179,29 @@ public class UserServiceTest {
 
     try {
       userService.upgradeLevels();
+      Assert.fail("TestUserServiceException expected");
+    } catch (TestUserServiceException e) {
+    }
+
+    checkLevelUpgraded(users.get(1), false);
+  }
+
+  @Test
+  @DirtiesContext
+  public void upgradeAllOrNothingFactoryBean() throws Exception {
+    TestUserService testUserService = new TestUserService(users.get(3).getId());
+    testUserService.setUserDao(userDao);
+    testUserService.setMailSender(mailSender);
+
+    TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userServiceTx", TxProxyFactoryBean.class);
+    txProxyFactoryBean.setTarget(testUserService);
+    UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+
+    userDao.deleteAll();
+    for (User user : users) userDao.add(user);
+
+    try {
+      txUserService.upgradeLevels();
       Assert.fail("TestUserServiceException expected");
     } catch (TestUserServiceException e) {
     }
