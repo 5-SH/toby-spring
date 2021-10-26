@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSender;
@@ -194,6 +195,29 @@ public class UserServiceTest {
     testUserService.setMailSender(mailSender);
 
     TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userServiceTx", TxProxyFactoryBean.class);
+    txProxyFactoryBean.setTarget(testUserService);
+    UserService txUserService = (UserService) txProxyFactoryBean.getObject();
+
+    userDao.deleteAll();
+    for (User user : users) userDao.add(user);
+
+    try {
+      txUserService.upgradeLevels();
+      Assert.fail("TestUserServiceException expected");
+    } catch (TestUserServiceException e) {
+    }
+
+    checkLevelUpgraded(users.get(1), false);
+  }
+
+  @Test
+  @DirtiesContext
+  public void ugradeAllOrNothingAdvisor() throws Exception {
+    TestUserService testUserService = new TestUserService(users.get(3).getId());
+    testUserService.setUserDao(userDao);
+    testUserService.setMailSender(mailSender);
+
+    ProxyFactoryBean txProxyFactoryBean = context.getBean("&userServiceAdvisor", ProxyFactoryBean.class);
     txProxyFactoryBean.setTarget(testUserService);
     UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
