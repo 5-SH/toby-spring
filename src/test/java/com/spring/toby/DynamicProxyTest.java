@@ -1,5 +1,6 @@
 package com.spring.toby;
 
+import com.spring.toby.independent.TestUserServiceException;
 import com.spring.toby.proxy.Hello;
 import com.spring.toby.proxy.HelloTarget;
 import com.spring.toby.proxy.HelloUppercase;
@@ -10,6 +11,8 @@ import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 
 import java.lang.reflect.Proxy;
 
@@ -39,6 +42,27 @@ public class DynamicProxyTest {
     public Object invoke(MethodInvocation invocation) throws Throwable {
       String ret = (String) invocation.proceed();
       return ret.toUpperCase();
+    }
+  }
+
+  @Test
+  public void pointcutAdvisor() {
+    ProxyFactoryBean pfBean = new ProxyFactoryBean();
+    pfBean.setTarget(new HelloTarget());
+
+    NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+    pointcut.setMappedName("sayH*");
+
+    pfBean.addAdvisor(new DefaultPointcutAdvisor(pointcut, new UpperCaseAdvice()));
+
+    Hello proxiedHello = (Hello) pfBean.getObject();
+
+    Assert.assertThat(proxiedHello.sayHello("Toby"), Is.is("HELLO TOBY"));
+    Assert.assertThat(proxiedHello.sayHi("Toby"), Is.is("HI TOBY"));
+    try {
+      if (!"THANK YOU TOBY".equals(proxiedHello.sayThankYou("Toby"))) throw new RuntimeException();
+      Assert.fail("Exception expected");
+    } catch (RuntimeException e) {
     }
   }
 
