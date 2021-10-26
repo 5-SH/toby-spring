@@ -4,13 +4,16 @@ import com.spring.toby.proxy.Hello;
 import com.spring.toby.proxy.HelloTarget;
 import com.spring.toby.proxy.HelloUppercase;
 import com.spring.toby.proxy.UppercaseHandler;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.aop.framework.ProxyFactoryBean;
 
 import java.lang.reflect.Proxy;
 
-public class ProxyTest {
+public class DynamicProxyTest {
   @Test
   public void simpleProxy() {
     Hello hello = new HelloTarget();
@@ -18,6 +21,25 @@ public class ProxyTest {
     Assert.assertThat(hello.sayHello("Toby"), Is.is("Hello Toby"));
     Assert.assertThat(hello.sayHi("Toby"), Is.is("Hi Toby"));
     Assert.assertThat(hello.sayThankYou("Toby"), Is.is("Thank You Toby"));
+  }
+
+  @Test
+  public void proxyFactoryBean() {
+    ProxyFactoryBean pfBean = new ProxyFactoryBean();
+    pfBean.setTarget(new HelloTarget());
+    pfBean.addAdvice(new UpperCaseAdvice());
+
+    Hello proxiedHello = (Hello) pfBean.getObject();
+    Assert.assertThat(proxiedHello.sayHello("Toby"), Is.is("HELLO TOBY"));
+    Assert.assertThat(proxiedHello.sayHi("Toby"), Is.is("HI TOBY"));
+    Assert.assertThat(proxiedHello.sayThankYou("Toby"), Is.is("THANK YOU TOBY"));
+  }
+
+  static class UpperCaseAdvice implements MethodInterceptor {
+    public Object invoke(MethodInvocation invocation) throws Throwable {
+      String ret = (String) invocation.proceed();
+      return ret.toUpperCase();
+    }
   }
 
   @Test
