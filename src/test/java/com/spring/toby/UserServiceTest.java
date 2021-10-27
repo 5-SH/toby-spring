@@ -31,7 +31,7 @@ import java.util.List;
 @ContextConfiguration(locations="classpath:applicationContext.xml")
 public class UserServiceTest {
   @Autowired
-  UserServiceImpl userServiceImpl;
+  UserService userService;
   @Autowired
   UserDao userDao;
   @Autowired
@@ -40,6 +40,8 @@ public class UserServiceTest {
   MailSender mailSender;
   @Autowired
   ApplicationContext context;
+  @Autowired
+  UserService testUserService;
 
   List<User> users;
 
@@ -56,7 +58,7 @@ public class UserServiceTest {
 
   @Test
   public void bean() {
-    Assert.assertThat(this.userServiceImpl, Is.is(IsNull.notNullValue()));
+    Assert.assertThat(this.userService, Is.is(IsNull.notNullValue()));
   }
 
   @Test
@@ -127,8 +129,8 @@ public class UserServiceTest {
     User userWithoutLevel = users.get(0);
     userWithoutLevel.setLevel(null);
 
-    userServiceImpl.add(userWithLevel);
-    userServiceImpl.add(userWithoutLevel);
+    userService.add(userWithLevel);
+    userService.add(userWithoutLevel);
 
     User userWithLevelRead = userDao.get(userWithLevel.getId());
     User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
@@ -139,7 +141,7 @@ public class UserServiceTest {
 
   @Test
   public void upgradeAllOrNothing() throws Exception {
-    UserServiceImpl testUserServiceImpl = new TestUserService(users.get(3).getId());
+    TestUserServiceImpl testUserServiceImpl = new TestUserServiceImpl(users.get(3).getId());
     testUserServiceImpl.setUserDao(userDao);
 //    testUserService.setDataSource(dataSource);
 //    testUserServiceImpl.setTransactionManager(transactionManager);
@@ -163,7 +165,7 @@ public class UserServiceTest {
 
   @Test
   public void upgradeAllOrNothingProxy() throws Exception {
-    UserServiceImpl testUserServiceImpl = new TestUserService(users.get(3).getId());
+    TestUserServiceImpl testUserServiceImpl = new TestUserServiceImpl(users.get(3).getId());
     testUserServiceImpl.setUserDao(userDao);
     testUserServiceImpl.setMailSender(mailSender);
 
@@ -190,7 +192,7 @@ public class UserServiceTest {
   @Test
   @DirtiesContext
   public void upgradeAllOrNothingFactoryBean() throws Exception {
-    TestUserService testUserService = new TestUserService(users.get(3).getId());
+    TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
     testUserService.setUserDao(userDao);
     testUserService.setMailSender(mailSender);
 
@@ -213,7 +215,7 @@ public class UserServiceTest {
   @Test
   @DirtiesContext
   public void ugradeAllOrNothingAdvisor() throws Exception {
-    TestUserService testUserService = new TestUserService(users.get(3).getId());
+    TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
     testUserService.setUserDao(userDao);
     testUserService.setMailSender(mailSender);
 
@@ -233,12 +235,41 @@ public class UserServiceTest {
     checkLevelUpgraded(users.get(1), false);
   }
 
+  @Test
+  public void upgradeAllOrNothingAutoProxy() throws Exception {
+    userDao.deleteAll();
+    for (User user : users) userDao.add(user);
+
+    try {
+      this.testUserService.upgradeLevels();
+      Assert.fail("TestUserServiceException expected");
+    } catch (TestUserServiceException e) {
+    }
+
+    checkLevelUpgraded(users.get(1), false);
+  }
+
   private void checkLevelUpgraded(User user, boolean upgraded) {
     User userUpdate = userDao.get(user.getId());
     if (upgraded) {
       Assert.assertThat(userUpdate.getLevel(), Is.is(user.getLevel().nextLevel()));
     } else {
       Assert.assertThat(userUpdate.getLevel(), Is.is(user.getLevel()));
+    }
+  }
+
+  static class TestUserServiceImpl extends UserServiceImpl {
+    private String id = "test4";
+
+    public TestUserServiceImpl() {}
+
+    public TestUserServiceImpl(String id) {
+      this.id = id;
+    }
+
+    protected void upgradeLevel(User user) {
+      if (user.getId().equals(this.id)) throw new TestUserServiceException();
+      super.upgradeLevel(user);
     }
   }
 }

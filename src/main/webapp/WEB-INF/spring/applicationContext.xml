@@ -44,12 +44,12 @@
 	<bean id="mailSender" class="com.spring.toby.independent.DummyMailSender">
 	</bean>
 
-	<bean id="userService" class="com.spring.toby.independent.UserServiceTx">
+	<bean id="userServiceOld" class="com.spring.toby.independent.UserServiceTx">
 		<property name="transactionManager" ref="transactionManager" />
-		<property name="userService" ref="userServiceImpl" />
+		<property name="userService" ref="userService" />
 	</bean>
 
-	<bean id="userServiceImpl" class="com.spring.toby.independent.UserServiceImpl">
+	<bean id="userService" class="com.spring.toby.independent.UserServiceImpl">
 		<property name="userDao" ref="userDao" />
 <!--		<property name="dataSource" ref="dataSource" />-->
 		<property name="mailSender" ref="mailSender" />
@@ -60,7 +60,7 @@
 	</bean>
 
 	<bean id="userServiceTx" class="com.spring.toby.factorybean.TxProxyFactoryBean">
-		<property name="target" ref="userServiceImpl" />
+		<property name="target" ref="userService" />
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="pattern" value="upgradeLevels" />
 		<property name="serviceInterface" value="com.spring.toby.independent.UserService" />
@@ -70,7 +70,12 @@
 		<property name="transactionManager" ref="transactionManager" />
 	</bean>
 
-	<bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+<!--	<bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">-->
+<!--		<property name="mappedName" value="upgrade*" />-->
+<!--	</bean>-->
+
+	<bean id="transactionPointcut" class="com.spring.toby.proxy.NameMatchClassMethodPointcut">
+		<property name="mappedClassName" value="*ServiceImpl" />
 		<property name="mappedName" value="upgrade*" />
 	</bean>
 
@@ -80,11 +85,15 @@
 	</bean>
 
 	<bean id="userServiceAdvisor" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<property name="target" ref="userServiceImpl" />
+		<property name="target" ref="userService" />
 		<property name="interceptorNames">
 			<list>
 				<value>transactionAdvisor</value>
 			</list>
 		</property>
 	</bean>
+
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+
+	<bean id="testUserService" class="com.spring.toby.UserServiceTest$TestUserServiceImpl" parent="userService" />
 </beans>

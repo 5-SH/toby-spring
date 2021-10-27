@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     this.mailSender = mailSender;
   }
 
-  public void upgradeLevels() throws Exception {
+  public void upgradeLevels() {
     List<User> users = userDao.getAll();
     for (User user : users) {
       if (canUpgradeLevel(user)) {
