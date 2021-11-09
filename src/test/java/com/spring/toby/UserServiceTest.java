@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
@@ -141,15 +142,15 @@ public class UserServiceTest {
 
   @Test
   public void upgradeAllOrNothing() throws Exception {
-    TestUserServiceImpl testUserServiceImpl = new TestUserServiceImpl(users.get(3).getId());
-    testUserServiceImpl.setUserDao(userDao);
+    TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
+    testUserService.setUserDao(userDao);
 //    testUserService.setDataSource(dataSource);
-//    testUserServiceImpl.setTransactionManager(transactionManager);
-    testUserServiceImpl.setMailSender(mailSender);
+//    testUserService.setTransactionManager(transactionManager);
+    testUserService.setMailSender(mailSender);
 
     UserServiceTx userServiceTx = new UserServiceTx();
     userServiceTx.setTransactionManager(transactionManager);
-    userServiceTx.setUserService(testUserServiceImpl);
+    userServiceTx.setUserService(testUserService);
 
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
@@ -165,12 +166,12 @@ public class UserServiceTest {
 
   @Test
   public void upgradeAllOrNothingProxy() throws Exception {
-    TestUserServiceImpl testUserServiceImpl = new TestUserServiceImpl(users.get(3).getId());
-    testUserServiceImpl.setUserDao(userDao);
-    testUserServiceImpl.setMailSender(mailSender);
+    TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
+    testUserService.setUserDao(userDao);
+    testUserService.setMailSender(mailSender);
 
     TransactionHandler txHandler = new TransactionHandler();
-    txHandler.setTarget(testUserServiceImpl);
+    txHandler.setTarget(testUserService);
     txHandler.setTransactionManager(transactionManager);
     txHandler.setPattern("upgradeLevels");
     UserService userService = (UserService) Proxy.newProxyInstance(
@@ -250,8 +251,25 @@ public class UserServiceTest {
   }
 
   @Test
+  public void upgradeAllOrNothingTxAop() throws Exception {
+    userDao.deleteAll();
+    for (User user : users) userDao.add(user);
+
+    try {
+      this.testUserService.upgradeLevels();
+      Assert.fail("TestUserServiceException expected");
+    } catch (TestUserServiceException e) {
+    }
+  }
+
+  @Test
   public void advisorAutoProxyCreator() {
     Assert.assertThat(testUserService, Is.is(java.lang.reflect.Proxy.class));
+  }
+
+  @Test(expected= TransientDataAccessResourceException.class)
+  public void readOnlyTransactionAttribute() {
+    testUserService.getAll();
   }
 
   private void checkLevelUpgraded(User user, boolean upgraded) {
