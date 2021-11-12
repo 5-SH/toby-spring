@@ -20,9 +20,13 @@ import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
@@ -30,6 +34,8 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="classpath:applicationContext.xml")
+@Transactional
+@TransactionConfiguration(defaultRollback = false)
 public class UserServiceTest {
   @Autowired
   UserService userService;
@@ -141,6 +147,7 @@ public class UserServiceTest {
   }
 
   @Test
+  @Transactional(propagation = Propagation.NEVER)
   public void upgradeAllOrNothing() throws Exception {
     TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
     testUserService.setUserDao(userDao);
@@ -165,6 +172,7 @@ public class UserServiceTest {
   }
 
   @Test
+  @Transactional(propagation = Propagation.NEVER)
   public void upgradeAllOrNothingProxy() throws Exception {
     TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
     testUserService.setUserDao(userDao);
@@ -192,6 +200,7 @@ public class UserServiceTest {
 
   @Test
   @DirtiesContext
+  @Transactional(propagation = Propagation.NEVER)
   public void upgradeAllOrNothingFactoryBean() throws Exception {
     TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
     testUserService.setUserDao(userDao);
@@ -215,6 +224,7 @@ public class UserServiceTest {
 
   @Test
   @DirtiesContext
+  @Transactional(propagation = Propagation.NEVER)
   public void ugradeAllOrNothingAdvisor() throws Exception {
     TestUserServiceImpl testUserService = new TestUserServiceImpl(users.get(3).getId());
     testUserService.setUserDao(userDao);
@@ -237,6 +247,7 @@ public class UserServiceTest {
   }
 
   @Test
+  @Transactional(propagation = Propagation.NEVER)
   public void upgradeAllOrNothingAutoProxy() throws Exception {
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
@@ -251,6 +262,7 @@ public class UserServiceTest {
   }
 
   @Test
+  @Transactional(propagation = Propagation.NEVER)
   public void upgradeAllOrNothingTxAop() throws Exception {
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
@@ -268,8 +280,18 @@ public class UserServiceTest {
   }
 
   @Test(expected= TransientDataAccessResourceException.class)
+  @Transactional(propagation = Propagation.NEVER)
   public void readOnlyTransactionAttribute() {
     testUserService.getAll();
+  }
+
+  @Test
+//  @Transactional
+  @Rollback
+  public void transactionSync() {
+    userService.deleteAll();
+    userService.add(users.get(0));
+    userService.add(users.get(1));
   }
 
   private void checkLevelUpgraded(User user, boolean upgraded) {
