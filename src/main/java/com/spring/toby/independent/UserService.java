@@ -1,12 +1,19 @@
 package com.spring.toby.independent;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
+@Transactional
 public interface UserService {
-  public void add(User user);
-  User get(String id);
-  List<User> getAll();
+  void add(User user);
   void deleteAll();
   void update(User user);
-  public void upgradeLevels() throws Exception;
+  void upgradeLevels() throws Exception;
+
+  @Transactional(readOnly = true)
+  List<User> getAll();
+  @Transactional(readOnly = true)
+  User get(String id);
+
 }
