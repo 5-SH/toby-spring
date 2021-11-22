@@ -6,7 +6,6 @@ import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.servlet.ServletContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -20,7 +19,7 @@ public class JaxbTest {
     JAXBContext context = JAXBContext.newInstance(contextPath);
     Unmarshaller unmarshaller = context.createUnmarshaller();
 
-    Sqlmap sqlmap = (Sqlmap) unmarshaller.unmarshal(this.getClass().getClassLoader().getResourceAsStream("sqlmap.xml"));
+    Sqlmap sqlmap = (Sqlmap) unmarshaller.unmarshal(this.getClass().getClassLoader().getResourceAsStream("testsqlmap.xml"));
     List<SqlType> sqlList = sqlmap.getSql();
 
     Assert.assertThat(sqlList.size(), Is.is(3));
