@@ -143,6 +143,14 @@
 <!--		<property name="sqlRegistry" ref="sqlRegistry" />-->
 <!--	</bean>-->
 
-	<bean id="sqlService" class="com.spring.toby.sqlservice.DefaultSqlService" />
+<!--	<bean id="sqlService" class="com.spring.toby.sqlservice.DefaultSqlService" />-->
+
+	<bean id="sqlService" class="com.spring.toby.sqlservice.OxmSqlService">
+		<property name="unmarshaller" ref="unmarshaller" />
+	</bean>
+
+	<bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+		<property name="contextPath" value="com.spring.toby.sqlservice.jaxb" />
+	</bean>
 
 </beans>
