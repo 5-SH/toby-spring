@@ -4,6 +4,7 @@
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 						https://www.springframework.org/schema/beans/spring-beans.xsd
 						http://www.springframework.org/schema/aop
@@ -11,7 +12,8 @@
 						http://www.springframework.org/schema/tx
 						http://www.springframework.org/schema/tx/spring-tx.xsd
 						http://www.springframework.org/schema/context
-						http://www.springframework.org/schema/context/spring-context.xsd">
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/jdbc">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	<bean id="connectionMaker" class="com.spring.toby.basic.DConnectionMaker" />
@@ -154,6 +156,13 @@
 		<property name="contextPath" value="com.spring.toby.sqlservice.jaxb" />
 	</bean>
 
-	<bean id="sqlRegistry" class="com.spring.toby.sqlservice.ConcurrentHashMapSqlRegistry" />
+<!--	<bean id="sqlRegistry" class="com.spring.toby.sqlservice.ConcurrentHashMapSqlRegistry" />-->
 
+	<jdbc:embedded-database id="embeddedDatabase" type="HSQL">
+		<jdbc:script location="classpath:sqlRegistrySchema.sql" />
+	</jdbc:embedded-database>
+
+	<bean id="sqlRegistry" class="com.spring.toby.sqlservice.EmbeddedDbSqlRegistry">
+		<property name="datasource" ref="embeddedDatabase" />
+	</bean>
 </beans>
