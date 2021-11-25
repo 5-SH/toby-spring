@@ -173,12 +173,6 @@
             <artifactId>spring-oxm</artifactId>
             <version>3.1.1.RELEASE</version>
         </dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.codehaus.castor</groupId>-->
-<!--			<artifactId>castor</artifactId>-->
-<!--			<version>1.2</version>-->
-<!--		</dependency>-->
-
 
 	</dependencies>
     <build>

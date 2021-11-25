@@ -147,11 +147,13 @@
 
 	<bean id="sqlService" class="com.spring.toby.sqlservice.OxmSqlService">
 		<property name="unmarshaller" ref="unmarshaller" />
-		<property name="sqlmap" value="file:C:\github\spring\toby-spring\src\main\java\com\spring\toby\independent\sqlmap.xml" />
+		<property name="sqlRegistry" ref="sqlRegistry" />
 	</bean>
 
 	<bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
 		<property name="contextPath" value="com.spring.toby.sqlservice.jaxb" />
 	</bean>
+
+	<bean id="sqlRegistry" class="com.spring.toby.sqlservice.ConcurrentHashMapSqlRegistry" />
 
 </beans>
