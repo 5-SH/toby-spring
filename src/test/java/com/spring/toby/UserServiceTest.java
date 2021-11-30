@@ -28,6 +28,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.SqlResultSetMapping;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
