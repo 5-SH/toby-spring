@@ -34,7 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="classpath:applicationContext.xml")
+//@ContextConfiguration(locations="classpath:test-applicationContext.xml")
+@ContextConfiguration(classes=TestApplicationContext.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = false)
 public class UserServiceTest {

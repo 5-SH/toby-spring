@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+						https://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/jdbc
+						http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+    <!-- Root Context: defines shared resources visible to all other web components -->
+    <bean id="connectionMaker" class="com.spring.toby.basic.DConnectionMaker" />
+    <bean id="basicUserDao" class="com.spring.toby.basic.BasicUserDao">
+        <property name="connectionMaker" ref="connectionMaker" />
+    </bean>
+
+    <bean id="jdbcContext" class="com.spring.toby.template.JdbcContext">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="newUserDao" class="com.spring.toby.news.NewUserDao">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="templateUserDao" class="com.spring.toby.template.TemplateUserDao">
+        <property name="dataSource" ref="dataSource" />
+        <property name="jdbcContext" ref="jdbcContext" />
+    </bean>
+
+    <bean id="apiUserDao" class="com.spring.toby.api.ApiUserDao">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="mailSender" class="com.spring.toby.independent.DummyMailSender">
+    </bean>
+
+    <bean id="userServiceOld" class="com.spring.toby.independent.UserServiceTx">
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="userService" ref="userService" />
+    </bean>
+
+    <bean id="userService" class="com.spring.toby.independent.UserServiceImpl">
+        <property name="userDao" ref="userDao" />
+        <property name="mailSender" ref="mailSender" />
+    </bean>
+
+    <bean id="userDao" class="com.spring.toby.independent.UserDaoJdbc">
+        <property name="dataSource" ref="dataSource" />
+        <property name="sqlService" ref="sqlService" />
+    </bean>
+
+    <bean id="userServiceTx" class="com.spring.toby.factorybean.TxProxyFactoryBean">
+        <property name="target" ref="userService" />
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="pattern" value="upgradeLevels" />
+        <property name="serviceInterface" value="com.spring.toby.independent.UserService" />
+    </bean>
+
+    <bean id="transactionAdvice" class="com.spring.toby.proxy.TransactionAdvice">
+        <property name="transactionManager" ref="transactionManager" />
+    </bean>
+
+    <bean id="transactionPointcut" class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
+        <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))" />
+    </bean>
+
+    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice" ref="transactionAdvice" />
+        <property name="pointcut" ref="transactionPointcut" />
+    </bean>
+
+    <bean id="userServiceAdvisor" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target" ref="userService" />
+        <property name="interceptorNames">
+            <list>
+                <value>transactionAdvisor</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- bean 후처리기 -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+
+    <bean id="testUserServiceImpl" class="com.spring.toby.UserServiceTest$TestUserServiceImpl" parent="userService" />
+
+    <bean id="testUserService" class="com.spring.toby.independent.TestUserService">
+        <property name="id" value="test4" />
+        <property name="userDao" ref="userDao" />
+        <property name="mailSender" ref="mailSender" />
+    </bean>
+
+    <tx:annotation-driven />
+
+    <bean id="sqlService" class="com.spring.toby.sqlservice.OxmSqlService">
+        <property name="unmarshaller" ref="unmarshaller" />
+        <property name="sqlRegistry" ref="sqlRegistry" />
+    </bean>
+
+    <bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="contextPath" value="com.spring.toby.sqlservice.jaxb" />
+    </bean>
+
+    <bean id="sqlRegistry" class="com.spring.toby.sqlservice.EmbeddedDbSqlRegistry">
+        <property name="dataSource" ref="embeddedDatabase" />
+    </bean>
+
+    <jdbc:embedded-database id="embeddedDatabase" type="HSQL">
+        <jdbc:script location="classpath:sqlRegistrySchema.sql" />
+    </jdbc:embedded-database>
+
+</beans>
