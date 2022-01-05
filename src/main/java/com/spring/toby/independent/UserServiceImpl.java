@@ -1,16 +1,22 @@
 package com.spring.toby.independent;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import java.util.List;
 
+@Service("userService")
 public class UserServiceImpl implements UserService {
+  @Autowired
   private UserDao userDao;
-//  private PlatformTransactionManager transactionManager;
+  @Autowired
   private MailSender mailSender;
+
+//  private PlatformTransactionManager transactionManager;
   public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
   public static final int MIN_RECOMMEND_FOR_GOLD = 30;
 

@@ -11,7 +11,9 @@ import com.spring.toby.sqlservice.SqlService;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -27,8 +29,14 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
+@ComponentScan(basePackages="com.spring.toby")
 // @ImportResource("classpath:test-applicationContext.xml")
 public class TestApplicationContext {
+  @Autowired
+  UserDao userDao;
+  @Autowired
+  UserService userService;
+
   @Bean
   public DataSource dataSource() {
     SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
@@ -51,7 +59,7 @@ public class TestApplicationContext {
   @Bean
   public TxProxyFactoryBean userServiceTx() {
     TxProxyFactoryBean factoryBean = new TxProxyFactoryBean();
-    factoryBean.setTarget(userService());
+    factoryBean.setTarget(this.userService);
     factoryBean.setTransactionManager(transactionManager());
     factoryBean.setPattern("upgradeLevels");
     factoryBean.setServiceInterface(UserService.class);
@@ -83,32 +91,29 @@ public class TestApplicationContext {
   @Bean
   public ProxyFactoryBean userServiceAdvisor() {
     ProxyFactoryBean factoryBean = new ProxyFactoryBean();
-    factoryBean.setTarget(userService());
+    factoryBean.setTarget(this.userService);
     factoryBean.setInterceptorNames(new String[] { "transactionAdvisor" });
     return factoryBean;
   }
 
-  @Bean
-  public UserDao userDao() {
-    UserDaoJdbc dao = new UserDaoJdbc();
-    dao.setDataSource(dataSource());
-    dao.setSqlService(sqlService());
-    return dao;
-  }
+//  @Bean
+//  public UserDao userDao() {
+//    return new UserDaoJdbc();
+//  }
 
-  @Bean
-  public UserService userService() {
-    UserServiceImpl service = new UserServiceImpl();
-    service.setUserDao(userDao());
-    service.setMailSender(mailSender());
-    return service;
-  }
+//  @Bean
+//  public UserService userService() {
+//    UserServiceImpl service = new UserServiceImpl();
+//    service.setUserDao(this.userDao);
+//    service.setMailSender(mailSender());
+//    return service;
+//  }
 
   @Bean
   public UserService testUserService() {
     TestUserService testService = new TestUserService();
     testService.setId("test4");
-    testService.setUserDao(userDao());
+    testService.setUserDao(this.userDao);
     testService.setMailSender(mailSender());
     return testService;
   }
@@ -116,7 +121,7 @@ public class TestApplicationContext {
   @Bean
   public UserServiceTest.TestUserServiceImpl testUserServiceImpl() {
     UserServiceTest.TestUserServiceImpl testUserService = new UserServiceTest.TestUserServiceImpl();
-    testUserService.setUserDao(userDao());
+    testUserService.setUserDao(this.userDao);
     testUserService.setMailSender(mailSender());
     return testUserService;
   }
