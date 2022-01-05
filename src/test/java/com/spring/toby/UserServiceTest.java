@@ -28,6 +28,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.persistence.SqlResultSetMapping;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
@@ -49,7 +50,7 @@ public class UserServiceTest {
   MailSender mailSender;
   @Autowired
   ApplicationContext context;
-  @Autowired
+  @Resource
   UserService testUserService;
 
   List<User> users;
@@ -305,7 +306,7 @@ public class UserServiceTest {
     }
   }
 
-  static class TestUserServiceImpl extends UserServiceImpl {
+  public static class TestUserServiceImpl extends UserServiceImpl {
     private String id = "test4";
 
     public TestUserServiceImpl() {}
