@@ -1,5 +1,6 @@
 package com.spring.toby;
 
+import com.spring.toby.context.AppContext;
 import com.spring.toby.factorybean.TxProxyFactoryBean;
 import com.spring.toby.independent.*;
 import com.spring.toby.independent.User;
@@ -21,6 +22,7 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -29,16 +31,16 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.persistence.SqlResultSetMapping;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(locations="classpath:test-applicationContext.xml")
-@ContextConfiguration(classes=TestApplicationContext.class)
+@ActiveProfiles("test")
+@ContextConfiguration(classes=AppContext.class)
 @Transactional
 @TransactionConfiguration(defaultRollback = false)
+//@ContextConfiguration(locations="classpath:test-applicationContext.xml")
 public class UserServiceTest {
   @Autowired
   UserService userService;
@@ -50,7 +52,7 @@ public class UserServiceTest {
   MailSender mailSender;
   @Autowired
   ApplicationContext context;
-  @Resource
+  @Autowired
   UserService testUserService;
 
   List<User> users;
@@ -282,7 +284,7 @@ public class UserServiceTest {
     Assert.assertThat(testUserService, Is.is(java.lang.reflect.Proxy.class));
   }
 
-  @Test(expected= TransientDataAccessResourceException.class)
+  @Test(expected=TransientDataAccessResourceException.class)
   @Transactional(propagation = Propagation.NEVER)
   public void readOnlyTransactionAttribute() {
     testUserService.getAll();
