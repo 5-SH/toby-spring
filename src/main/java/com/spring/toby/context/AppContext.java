@@ -7,12 +7,10 @@ import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -21,7 +19,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages="com.spring.toby")
-@Import({ SqlServiceContext.class, TestAppContext.class, ProductionAppContext.class })
+@Import({ SqlServiceContext.class })
 public class AppContext {
   @Autowired
   UserService userService;
@@ -74,4 +72,33 @@ public class AppContext {
     factoryBean.setServiceInterface(UserService.class);
     return factoryBean;
   }
+
+  @Configuration
+  @Profile("production")
+  public static class ProductionAppContext {
+    @Bean
+    public MailSender mailSender() {
+      JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+      mailSender.setHost("mail.com");
+      return mailSender;
+    }
+
+  }
+
+  @Configuration
+  @Profile("test")
+  public static class TestAppContext {
+    @Bean
+    public UserService testUserService() {
+      TestUserService testUserService = new TestUserService();
+      testUserService.setId("test4");
+      return testUserService;
+    }
+
+    @Bean
+    public MailSender mailSender() {
+      return new DummyMailSender();
+    }
+  }
+
 }

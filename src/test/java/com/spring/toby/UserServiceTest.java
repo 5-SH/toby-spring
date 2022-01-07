@@ -16,6 +16,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailSender;
@@ -54,6 +55,8 @@ public class UserServiceTest {
   ApplicationContext context;
   @Autowired
   UserService testUserService;
+  @Autowired
+  DefaultListableBeanFactory bf;
 
   List<User> users;
 
@@ -66,6 +69,13 @@ public class UserServiceTest {
             new User("test4", "테스트사", "p4", Level.SILVER, 60, UserServiceImpl.MIN_RECOMMEND_FOR_GOLD, "mail4@test.com"),
             new User("test5", "테스트오", "p5", Level.GOLD, 100, Integer.MAX_VALUE, "mail5@test.com")
     );
+  }
+
+  @Test
+  public void beans() {
+    for (String n : bf.getBeanDefinitionNames()) {
+      System.out.println(n + " \t " + bf.getBean(n).getClass().getName());
+    }
   }
 
   @Test
