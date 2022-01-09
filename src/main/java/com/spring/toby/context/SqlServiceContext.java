@@ -5,8 +5,10 @@ import com.spring.toby.sqlservice.EmbeddedDbSqlRegistry;
 import com.spring.toby.sqlservice.OxmSqlService;
 import com.spring.toby.sqlservice.SqlRegistry;
 import com.spring.toby.sqlservice.SqlService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -16,14 +18,21 @@ import javax.sql.DataSource;
 
 @Configuration
 public class SqlServiceContext {
+  @Autowired
+  Environment env;
+
   @Bean
   public DataSource dataSource() {
     SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
 
-    dataSource.setDriverClass(Driver.class);
-    dataSource.setUrl("jdbc:mysql://localhost/spring");
-    dataSource.setUsername("root");
-    dataSource.setPassword("root");
+    try {
+      dataSource.setDriverClass((Class<? extends java.sql.Driver>)Class.forName(env.getProperty("db.driverClass")));
+    } catch(ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    dataSource.setUrl(env.getProperty("db.url"));
+    dataSource.setUsername(env.getProperty("db.username"));
+    dataSource.setPassword(env.getProperty("db.password"));
 
     return dataSource;
   }

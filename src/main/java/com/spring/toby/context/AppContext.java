@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @ComponentScan(basePackages="com.spring.toby")
 @Import({ SqlServiceContext.class })
+@PropertySource("classpath:database.properties")
 public class AppContext {
   @Autowired
   UserService userService;
