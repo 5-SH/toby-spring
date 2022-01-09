@@ -1,9 +1,7 @@
 package com.spring.toby.context;
 
-import com.spring.toby.sqlservice.EmbeddedDbSqlRegistry;
-import com.spring.toby.sqlservice.OxmSqlService;
-import com.spring.toby.sqlservice.SqlRegistry;
-import com.spring.toby.sqlservice.SqlService;
+import com.spring.toby.sqlservice.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -13,11 +11,15 @@ import javax.sql.DataSource;
 
 @Configuration
 public class SqlServiceContext {
+  @Autowired
+  SqlMapConfig sqlMapConfig;
+
   @Bean
   public SqlService sqlService() {
     OxmSqlService sqlService = new OxmSqlService();
     sqlService.setUnmarshaller(unmarshaller());
     sqlService.setSqlRegistry(sqlRegistry());
+    sqlService.setSqlmap(this.sqlMapConfig.getSqlMapResource());
     return sqlService;
   }
 
